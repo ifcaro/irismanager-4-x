@@ -3184,7 +3184,11 @@ int launch_iso_game(char *path, int mtype)
         
         if(stat(path, &s)==0) fp = fopen(path, "rb");
 
-        if(fp) {
+        if(fp) {			
+			fseek(fp, 0x800, SEEK_SET);
+			
+            fread((void *) plugin_args + 512, 1, 16, fp); // PlayStation3
+			
             fseek(fp, 0x8000, SEEK_SET);
 
             fread((void *) plugin_args, 1, 256, fp);
@@ -3197,7 +3201,7 @@ int launch_iso_game(char *path, int mtype)
 
             if(!memcmp((void *) &plugin_args[8], "PSP GAME", 8)) type = 666;
             else if(!memcmp((void *) &plugin_args[1], "BEA01", 5)) type = EMU_BD;
-            else if(!memcmp((void *) &plugin_args[0x28], "PS3VOLUME", 9)) type = EMU_PS3;
+            else if(!memcmp((void *) &plugin_args[0x28], "PS3VOLUME", 9) || !memcmp((void *) &plugin_args[512], "PlayStation3", 12)) type = EMU_PS3;
             else if(!memcmp((void *) &plugin_args[8], "PLAYSTATION", 11) || !memcmp((void *) &plugin_args[256], "PLAYSTATION", 11) ) {
                 if(!strncmp(path, "/ntfs", 5) || !strncmp(path, "/ext", 4)) type = EMU_PSX;
                 else {type = EMU_PS2_DVD; is_ps2_game = 1;}

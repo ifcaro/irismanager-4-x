@@ -1,0 +1,6 @@
+build/
+*.self
+EBOOT.BIN
+*.elf
+*.pkg
+*.bak

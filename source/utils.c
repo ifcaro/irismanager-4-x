@@ -917,6 +917,8 @@ void fill_iso_entries_from_device(char *path, u32 flag, t_directories *list, int
         FILE *fp = fopen(list[*max ].path_name, "rb");
 
         if(fp) {
+			fseek(fp, 0x800, SEEK_SET);
+            fread((void *) mem + 768, 1, 16, fp); // PlayStation3
             fseek(fp, 0x810, SEEK_SET);
             fread((void *) mem + 256, 1, 10, fp); // read PS3 disc iD
             mem[256 + 10] = 0;
@@ -929,7 +931,7 @@ void fill_iso_entries_from_device(char *path, u32 flag, t_directories *list, int
             fclose(fp);
 
             if(flag & D_FLAG_HOMEB) list[*max ].flags = flag;
-            else if(!memcmp((void *) &mem[0x28], "PS3VOLUME", 9)) list[*max ].flags = flag | D_FLAG_PS3_ISO;
+            else if(!memcmp((void *) &mem[0x28], "PS3VOLUME", 9) || !memcmp((void *) &mem[768], "PlayStation3", 12)) list[*max ].flags = flag | D_FLAG_PS3_ISO;
             else if(!memcmp((void *) &mem[8], "PLAYSTATION", 11) || !memcmp((void *) &mem[512], "PLAYSTATION", 11)) {
                 list[*max ].flags = flag | D_FLAG_PS2_ISO;
                 if(!memcmp((void *) &mem[8], "PLAYSTATION", 11)) memcpy((void *) mem + 256, (void *) &mem[0x28], 10); 
